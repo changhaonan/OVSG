@@ -8,6 +8,14 @@ To appear at [CoRL'23](https://www.corl2023.org/).
 
 ```bibtex
 @inproceedings{
+chang2023contextaware,
+title={Context-Aware Entity Grounding with Open-Vocabulary 3D Scene Graphs},
+author={Haonan Chang and Kowndinya Boyalakuntla and Shiyang Lu and Siwei Cai and Eric Pu Jing and Shreesh Keskar and Shijie Geng and Adeeb Abbas and Lifeng Zhou and Kostas Bekris and Abdeslam Boularious},
+booktitle={7th Annual Conference on Robot Learning},
+year={2023},
+url={https://openreview.net/forum?id=cjEI5qXoT0}
+}
+@inproceedings{
 lu2023ovird,
 title={{OVIR}-3D: Open-Vocabulary 3D Instance Retrieval Without Training on 3D Data},
 author={Shiyang Lu and Haonan Chang and Eric Pu Jing and Abdeslam Boularias and Kostas Bekris},
