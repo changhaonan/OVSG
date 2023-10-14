@@ -2,25 +2,26 @@
 import open3d as o3d
 import os
 import numpy as np
+import copy
 
 
-def estimate_floor(pcd):
+def estimate_floor(original_pcd):
     """Estimate the floor plane of the scene using RANSAC."""
     origin = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.5)
 
     # Segment the largest plane using RANSAC
-    plane_model, inliers = pcd.segment_plane(distance_threshold=0.01,
-                                             ransac_n=3,
-                                             num_iterations=1000)
+    plane_model, inliers = original_pcd.segment_plane(distance_threshold=0.01,
+                                                      ransac_n=3,
+                                                      num_iterations=1000)
     [a, b, c, d] = plane_model
     print(f"Plane equation: {a:.2f}x + {b:.2f}y + {c:.2f}z + {d:.2f} = 0")
 
     # Create a point cloud for inliers (points that belong to the plane)
-    inlier_cloud = pcd.select_by_index(inliers)
+    inlier_cloud = original_pcd.select_by_index(inliers)
     inlier_cloud.paint_uniform_color([1.0, 0, 0])  # Paint the inliers in red
 
     # Create a point cloud for outliers (points that don"t belong to the plane)
-    outlier_cloud = pcd.select_by_index(inliers, invert=True)
+    outlier_cloud = original_pcd.select_by_index(inliers, invert=True)
     # Compute the centroid of the inlier points
     centroid = np.mean(np.asarray(inlier_cloud.points), axis=0)
 
@@ -51,11 +52,12 @@ def estimate_floor(pcd):
     transform_r = np.eye(4, dtype=np.float32)
     transform_r[:3, :3] = np.linalg.inv(rotation_matrix)
     transform = np.matmul(transform_r, transform_t)
-    pcd.transform(transform)
+    tranform_pcd = copy.deepcopy(original_pcd)
+    tranform_pcd.transform(transform)
 
     # Visualize the transformed point cloud and origin
     # o3d.visualization.draw_geometries([pcd, origin])
-    return transform, pcd
+    return transform, tranform_pcd
 
 
 def convert_ply2pcd(ply_path, pcd_path):
@@ -78,12 +80,24 @@ if __name__ == "__main__":
     obb = pcd.get_minimal_oriented_bounding_box()
     obb.color = (1, 0, 0)
 
-    # extract transform from obb
-    obb_tf = obb.get_rotation_matrix_from_xyz((0, 0, 0))
+    # compute floor
+    floor_T, _ = estimate_floor(pcd)
+
+    aligned_T = np.eye(4, dtype=np.float32)
+    aligned_T[:3, :3] = obb.R
+    aligned_T[:3, 3] = obb.center
     
-    aligned_tf = np.eye(4, dtype=np.float32)
+    # 
 
     vis_list = [pcd, obb]
+    aligned_origin = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1.0)
+    aligned_origin.transform(aligned_T)
+    vis_list.append(aligned_origin)
+
+    floor_origin = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1.0)
+    floor_origin.transform(floor_T)
+    vis_list.append(floor_origin)
+
     origin = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1.0)
     vis_list.append(origin)
     o3d.visualization.draw_geometries(vis_list)

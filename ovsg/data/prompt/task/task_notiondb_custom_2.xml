@@ -1,0 +1,7 @@
+<root>
+    <env>notiondbovi</env>
+    <instruction label="Chair1">A chair that is in front of the desk</instruction>
+    <instruction label="Chair2">A chair that is behind the desk</instruction>
+    <instruction label="Monitor1">A monitor that is on the desk</instruction>
+    <instruction label="Monitor2">A monitor that is on the desk and behind a monitor</instruction>
+</root>

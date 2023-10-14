@@ -8,7 +8,7 @@ log/*
 ovsg/log/*
 # *.yaml
 *.txt
-*.xml
+# *.xml
 test_data/*
 
 # python
