@@ -2,9 +2,9 @@
 
 **Context-Aware Entity Grounding with Open-Vocabulary 3D Scene Graphs**
 
-*Authors: [Haonan Chang](https://github.com/changhaonan/), [Kowndinya Boyalakuntla](https://kowndinya2000.github.io), Shiyang Lu, Siwei Cai, Eric Jing, Shreesh Keskar, Shijie Geng, Adeeb Abbas, Lifeng Zhou, Kostas Bekris, [Abdeslam Boularias](http://www.abdeslam.net/)*
+**Authors:** [Haonan Chang](https://github.com/changhaonan/), [Kowndinya Boyalakuntla](https://kowndinya2000.github.io), Shiyang Lu, Siwei Cai, Eric Jing, Shreesh Keskar, Shijie Geng, Adeeb Abbas, Lifeng Zhou, Kostas Bekris, [Abdeslam Boularias](http://www.abdeslam.net/)
 
-To appear at [CoRL '23](https://www.corl2023.org/).
+**Publication Venue:** [CoRL '23](https://www.corl2023.org/)
 
 ## Introduction
 Welcome to the official implementation of Open-Vocabulary 3D Scene Graphs (OVSG). 
@@ -75,7 +75,8 @@ python example/example_ovsg_only.py
 
 ## Evaluation Code
 
-Being cleaned. Coming soon.
+Checkout [evaluation readme](./evaluation/README.md) for instructions.
+Full version is being cleaned and will be released soon.
 
 ## Trouble Shooting
 
@@ -85,9 +86,9 @@ This repo is being actively maintained, feel free to raise problems in GitHub is
 
 We also provide a new vision language dataset `DOVE-G`. You can download it from this link: [Link](https://doi.org/10.6084/m9.figshare.24307072.v1).
 
-# Bibtex
+## Citation
 
-If you find `OVSG` and `OVIR-3D` useful or relevant to your work, please cite them using the following BibTeX entries:
+If `OVSG` and `OVIR-3D` prove useful or relevant to your research, kindly consider citing them using the BibTeX entries below:
 
 ```bibtex
 @inproceedings{

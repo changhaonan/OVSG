@@ -4,6 +4,7 @@
 defaults:
   - env: notionovidb
   - api: openai
+  - app: base
 # path to original working directory (that `train.py` was executed from in command line)
 # hydra hijacks working directory by changing it to the current log directory,
 # so it's useful to have path to original working directory as a special variable
@@ -45,7 +46,7 @@ prompt_device: "cuda"
 prompt_top_k: 5
 
 ## app
-app_name: base
+app_name: env_only
 
 hydra:
   run:

@@ -449,7 +449,7 @@ class OVIMapDetic(OVIMap):
             "detections" in self.instances[instance_id]
             and self.instances[instance_id]["detections"] is not None
         ):
-            (frame_id, detection_id, _) = self.instances[instance_id]["detections"][0]
+            (frame_id, detection_id) = self.instances[instance_id]["detections"][0]
             detic_result_path = os.path.join(self.detic_path, "instances", f"{frame_id}-color.pkl")
             detic_output = read_detectron_instances(detic_result_path)
             pred_scores = detic_output.scores.numpy()  # (M,)
@@ -478,9 +478,18 @@ class OVIMapDetic(OVIMap):
             )
             info_file = os.path.join(scene_path, f"{scene_name}.txt")
             color_img_path = os.path.join(scene_path, "color")
-        elif dataset == "custom_scannet":
+        elif dataset == "ovsg_scannet":
             scene_path = os.path.join(data_path, scene_name)
             geometry_file = os.path.join(scene_path, f"{scene_name}_vh_clean_2.ply")
+            detic_path = os.path.join(scene_path, "detic_output", detic_exp)
+            anno_file = os.path.join(
+                scene_path, "detic_output", detic_exp, "predictions", annotation_file
+            )
+            info_file = os.path.join(scene_path, f"{scene_name}.txt")
+            color_img_path = os.path.join(scene_path, "color")
+        elif dataset == "ovsg_dove-g":
+            scene_path = os.path.join(data_path, scene_name)
+            geometry_file = os.path.join(scene_path, "recon.pcd")
             detic_path = os.path.join(scene_path, "detic_output", detic_exp)
             anno_file = os.path.join(
                 scene_path, "detic_output", detic_exp, "predictions", annotation_file
@@ -505,7 +514,7 @@ if __name__ == "__main__":
     detic_exp = "imagenet21k-0.3"
     annotation_file = "proposed_fusion_detic_iou-0.25_recall-0.50_feature-0.75_interval-300.pkl"
     geometry_file, anno_file, info_file, color_img_path, detic_path = OVIMapDetic.parse_path(
-        data_path, scene_name, annotation_file, "custom_scannet", detic_exp=detic_exp
+        data_path, scene_name, annotation_file, "ovsg_scannet", detic_exp=detic_exp
     )
     intrinsic = np.array([[1000, 0, 399.5], [0, 1000, 499.5]])  # o3d requires .5
     img_height, img_width = 800, 1000

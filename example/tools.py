@@ -69,7 +69,7 @@ def convert_ply2pcd(ply_path, pcd_path):
 
 if __name__ == "__main__":
     root_dir = os.path.join(os.path.dirname(__file__), "..")
-    scene_name = "scene0645_00"  # "scene0645_00", "cus_scene0001_00"
+    scene_name = "cus_scene0001_00"  # "scene0645_00", "cus_scene0001_00"
     demo_ply_file = os.path.join(root_dir, "test_data", scene_name, f"{scene_name}_vh_clean_2.ply")
     demo_pcd_file = os.path.join(root_dir, "test_data", scene_name, "scan-00.pcd")  # fit with OVIR-3D format
     # convert_ply2pcd(demo_ply_file, demo_pcd_file)

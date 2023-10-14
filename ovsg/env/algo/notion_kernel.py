@@ -5,7 +5,8 @@ import torch
 import numpy as np
 import networkx as nx
 from matplotlib import pyplot as plt
-
+from ovsg.utils.gnn.gnn_matcher import GMatchArgs, GraphMatcher, GraphSimKernelModel, gnn_data2batch
+from ovsg.utils.gnn.models import GraphMatchingNetwork
 
 class NotionKernelWrapper(NotionGraphWrapper):
     """Wrapper for notion graph kernel, including gnn, jaccard, szymkiewicz_simpson"""

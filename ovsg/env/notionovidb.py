@@ -41,6 +41,7 @@ class NotionOVIDB(NotionDB):
             extrinsic = np.array(cfg.render_extrinsic)
         self.scene_map_cfg = {
             "data_path": cfg.ovi_data_path,
+            "exp_path": cfg.ovi_exp_path,
             "scene_name": cfg.ovi_scene_name,
             "detic_exp": cfg.ovi_detic_exp,
             "annotation_file": cfg.ovi_annotation_file,
@@ -583,7 +584,7 @@ class NotionOVIDB(NotionDB):
     # Eval-related methods
     def output_path(self):
         """Output path"""
-        root_data_path = self.scene_map_cfg["data_path"]
+        root_data_path = self.scene_map_cfg["exp_path"]
         with_user = "with" if self.eval_enable_user else "no"
         return os.path.join(
             root_data_path, self.exp_name, self.scene_map_cfg["scene_name"], with_user + "_user"
@@ -1030,9 +1031,54 @@ class NotionOVIDB(NotionDB):
     def eval(self, task_name, **kwargs):
         """eval task, task_name will be informat of 'task_type:task_file'"""
         task_type, task_scene = task_name.split(":")
-        if task_type == "query":
-            self.eval_query()
+        if task_type == "eval_query":
+            self.eval_enable_user = True
+            self.eval_query(method="jaccard")
+            self.eval_query(method="szymkiewicz_simpson")
+            self.eval_query(method="prob")
+            self.eval_query(method="base")
+
+            self.eval_enable_user = False
+            self.eval_query(method="jaccard")
+            self.eval_query(method="szymkiewicz_simpson")
+            self.eval_query(method="prob")
+            self.eval_query(method="base")
+
         elif task_type == "gen_query":
+            self.scene_map_cfg["scene_name"] = task_scene
+
+            self.eval_enable_user = True
+            self.gen_gt_match(iou_thresh=self.eval_iou_thresh)
+
+            self.gen_query_data(use_gt_map=True, enable_user=self.eval_enable_user)
+            self.gen_match_data(
+                top_k=self.eval_top_k, method="jaccard", enable_user=self.eval_enable_user
+            )
+            self.gen_match_data(
+                top_k=self.eval_top_k,
+                method="szymkiewicz_simpson",
+                enable_user=self.eval_enable_user,
+            )
+            self.gen_match_data(
+                top_k=self.eval_top_k, method="prob", enable_user=self.eval_enable_user
+            )
+
+            self.eval_enable_user = False
+            
+            self.gen_query_data(use_gt_map=True, enable_user=self.eval_enable_user)
+            self.gen_match_data(
+                top_k=self.eval_top_k, method="jaccard", enable_user=self.eval_enable_user
+            )
+            self.gen_match_data(
+                top_k=self.eval_top_k,
+                method="szymkiewicz_simpson",
+                enable_user=self.eval_enable_user,
+            )
+            self.gen_match_data(
+                top_k=self.eval_top_k, method="prob", enable_user=self.eval_enable_user
+            )
+
+        elif task_type == "gen_n_eval_query":
             self.scene_map_cfg["scene_name"] = task_scene
 
             self.eval_enable_user = True

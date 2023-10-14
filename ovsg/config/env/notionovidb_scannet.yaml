@@ -3,12 +3,12 @@ env_name: notionovidb
 
 ## notion related
 notion_base: default
-notion_device: "cuda"
+notion_device: "cuda:0"
 
-# encoder
+# encoder 
 notion_txt_encoder: ["st", "clip"]
 notion_usr_encoder: ["st"]
-notion_rel_encoder: ["st"] # "wv"
+notion_rel_encoder: ["st"]  # "wv"
 notion_img_encoder: ["clip"]
 notion_ins_encoder: ["detic"]
 
@@ -17,7 +17,7 @@ notion_address: spatial
 
 # gnn
 # gnn_padding: 20
-gnn_padding: 0
+gnn_padding: 10
 gnn_max_node_size: 300
 
 # params:
@@ -27,21 +27,17 @@ notion_overlap_thres: 0.001
 # test
 notion_dir: ${data_dir}/notion
 
-# OVIR-3D loading
+# ovimap
 is_scannet: True
-ovi_data_path: ${work_dir}/test_data/
-ovi_scene_name: cus_scene0001_00
-ovi_detic_exp: imagenet21k-0.3
-ovi_annotation_file: "proposed_fusion_detic_iou-0.25_recall-0.50_feature-0.75_interval-300.pkl"
-ovi_annotation_gt_file: None
+ovi_data_path: ${work_dir}/eval_data/scannet
+ovi_exp_path: ${work_dir}/eval_exps/scannet
+ovi_scene_name: "scene0011_00"
+ovi_detic_exp: "scan_net-0.3"
+ovi_annotation_file: "proposed_fusion_detic.pkl"
+ovi_annotation_gt_file: "proposed_fusion_gt.pkl"
 ovi_dataset: ovsg_scannet
 ovi_device: cuda
-
-# render related
-render_height: 1000
-render_width: 800
-render_intrinsic: [[1000, 0, 399.5], [0, 1000, 499.5]]
-render_extrinsic: None
+is_icl: False
 
 # eval
 eval_top_k: 5
@@ -54,6 +50,12 @@ user_default_photo: ${notion_dir}/user.jpeg
 # region relation
 rebuild_region: False
 region_resolution: 0.1
+
+# render related
+render_height: 1000
+render_width: 800
+render_intrinsic: [[1000, 0, 399.5], [0, 1000, 499.5]]
+render_extrinsic: None
 
 # execute option
 execute_options:
