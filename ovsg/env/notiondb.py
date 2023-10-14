@@ -75,7 +75,7 @@ class NotionDB(EnvBase):
         name: str,
         image=None,
         space: Space = Space.VIRTUAL,
-        tags=list[str] | None,
+        tags=list,
         **kwargs,
     ) -> int:
         """Add instance to NotionGraph
@@ -468,15 +468,7 @@ class NotionDB(EnvBase):
         assert notion_count > 0
         for i in tqdm.tqdm(range(notion_count)):
             graph_queries["address"].append(self.notion_graph.notions[i].address)
-            # if skip_regions and self.notion_graph.notions[i].name in class_labels_n_ids["scannet"]["BLACK_LIST"]:
-            #     continue
-            # elif skip_users and self.get_notion_type(self.notion_graph.notions[i].domain) == "user":
-            #     continue
-            # elif self.get_notion_type(self.notion_graph.notions[i].domain) == "region":
-            #     continue
             if self.get_notion_type(self.notion_graph.notions[i].domain) == "object":
-                # if self.get_notion_type(self.notion_graph.notions[i].domain) == "object" and self.notion_graph.notions[i].name not in class_labels_n_ids["scannet"]["BLACK_LIST"]:
-                # if True:
                 all_links = list(set(self.notion_graph.notions[i].links))
                 query_head = (
                     f"target @ {self.notion_graph.notions[i].name}"
