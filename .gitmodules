@@ -1,0 +1,3 @@
+[submodule "external/OVIR-3D"]
+	path = external/OVIR-3D
+	url = https://github.com/shiyoung77/OVIR-3D.git

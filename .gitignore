@@ -1,0 +1,15 @@
+.vscode
+.hydra
+*.pyc
+*.log
+
+# data
+log/*
+ovsg/log/*
+*.yaml
+*.txt
+*.xml
+test_data/*
+
+# python
+*.egg-info
