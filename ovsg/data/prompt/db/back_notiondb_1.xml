@@ -1,0 +1,165 @@
+<root>
+<tag> Positive Example </tag>
+<round>
+<user>
+I want to get the cracker box around the table in kitchen.
+</user>
+<assistant>
+There are three notions here: cracker box, table and kitchen. I can only use the relation provided.
+The query target is cracker box.
+This is a query for object of known category: cracker box.
+The relationship between cracker box and table is near. This relationship is a spatial relationship.
+The relationship between table and kitchen is in. This relationship is a spatial relationship.
+The notion, target, and relationship are:
+```
+target @ cracker box {object}
+cracker box {object} -- near [spatial] -- table {object}
+table {object} -- in [spatial] -- kitchen {region}
+```
+</assistant>
+</round>
+<round>
+<user>
+Bring Tom his favourite drink.
+</user>
+<assistant>
+There are two notions here: Tom and drink. I can only use the relation provided.
+This is a query for object of known category: drink.
+The relationship between me and drink is like. This relationship is a spatial relationship.
+The query target is drink. 
+The notion, target, and relationship are:
+```
+target @ drink {object}
+Tom {user} -- like [spatial] -- drink {object}
+```
+</assistant>
+</round>
+<round>
+<user>
+Can you find Marry's favourite coffee cup? It might be at the kitchen.
+</user>
+<assistant>
+There are three notions here: Mary, coffee cup, and kitchen. 
+This is a query for object of known category: coffee cup.
+The relationship between Mary and coffee cup is like. This relationship is a user relationship.
+The relationship between coffee cup and kitchen is in.  This relationship is a spatial relationship.
+The query target is coffee cup.
+The notion, target, and relationship are:
+```
+target @ coffee cup {object}
+Mary {user} -- like [user] -- coffee cup {object}
+coffee cup {object} -- in [spatial] -- kitchen {region}
+```
+</assistant>
+</round>
+<round>
+<user>
+Who is in left part of kitchen?
+</user>
+<assistant>
+There are two notions here: kitchen and person. 
+This is a query for unknown user. Here I use SOMEONE as pronoun.
+The relationship between SOMEONE and kitchen is left to. This relationship is a spatial relationship.
+The notion, target, and relationship are:
+```
+target @ SOMEONE {user}
+SOMEONE {user} -- left to [spatial] -- kitchen {region}
+```
+</assistant>
+</round>
+<round>
+<user>
+Where is Tim?
+</user>
+<assistant>
+There are two notions here: Tim and place. 
+This is a query for unknown region. Here I use SOMEWHERE as pronoun.
+The relationship between Tim and SOMEWHERE is in. This relationship is a spatial relationship.
+The notion, target, and relationship are:
+```
+target @ SOMEWHERE {region}
+Tim {user} -- in [spatial] -- SOMEWHERE {region}
+```
+</assistant>
+</round>
+<round>
+<user>
+Something that is expensive and in front part of kitchen.
+</user>
+<assistant>
+There are three notions here: Something, expensive, kitchen. 
+This is an query for an object of unknown catgory. Here I use SOMETHING as pronoun.
+The relationship between expensive and SOMETHING is tag. This relationship is a tag relationship.
+The relationship between SOMETHING and kitchen is in front of. This relationship is a spatial relationship.
+The notion, target, and relationship are:
+```
+target @ SOMETHING {object}
+expensive {tag} -- tag [tag] -- SOMETHING  {object}
+SOMETHING {object} -- in front of [spatial] -- kitchen {region}
+```
+</assistant>
+</round>
+<round>
+<user>
+I want to get a hard object in living room.
+</user>
+<assistant>
+There are three notions here: object, hard, living room. 
+This is an query for an object of unknown catgory. Here I use SOMETHING as pronoun.
+The relationship between hard and SOMETHING is tag. This relationship is a tag relationship.
+The relationship between SOMETHING and living room is in. This relationship is a spatial relationship.
+The notion, target, and relationship are:
+```
+target @ SOMETHING {object}
+hard {tag} -- tag [tag] -- SOMETHING {object}
+SOMETHING {object} -- in [spatial] -- living room {region}
+```
+</assistant>
+</round>
+<round>
+<user>
+Query a soft object on the table.
+</user>
+<assistant>
+There are three notions here: object, soft, table. 
+This is an query for an object of unknown catgory. Here I use SOMETHING as pronoun.
+The relationship between soft and SOMETHING is tag. This relationship is a tag relationship.
+The relationship between SOMETHING and table is on. This relationship is a spatial relationship.
+The notion, target, and relationship are:
+```
+target @ SOMETHING {object}
+soft {tag} -- tag [tag] -- SOMETHING {object}
+SOMETHING {object} -- on [spatial] -- table {object}
+```
+</assistant>
+</round>
+<round>
+<user>
+Query a cushion on sofa chair.
+</user>
+<assistant>
+There are two notions here: cushion, sofa chair.
+This is an query for an object of known catgory: cushion.
+The relationship between cushion and sofa chair is on. This relationship is a spatial relationship.
+The notion, target, and relationship are:
+```
+target @ cushion {object}
+cushion {object} -- on [spatial] -- sofa chair {object}
+```
+</assistant>
+</round>
+<round>
+<user>
+Give zoro a towel from his left side.
+</user>
+<assistant>
+There are two notions here: zoro and towel.
+This is an query for an object of known catgory: towel.
+The relationship between towel and zoro is left to. This relationship is a spatial relationship.
+```
+target @ towel {object}
+towel {object} -- left to [spatial] -- zoro {user}
+```
+</assistant>
+</round>
+</root>
