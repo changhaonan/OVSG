@@ -1,0 +1,52 @@
+# @package _global_
+
+# specify here default configuration
+defaults:
+  - env: notionovidb
+  - api: openai
+# path to original working directory (that `train.py` was executed from in command line)
+# hydra hijacks working directory by changing it to the current log directory,
+# so it's useful to have path to original working directory as a special variable
+# read more here: https://hydra.cc/docs/next/tutorials/basic/running_your_app/working_directory
+work_dir: ${hydra:runtime.cwd}
+
+# path to folder with data
+data_dir: ${work_dir}/data
+prompt_dir: ${data_dir}/prompt
+knowledge_dir: ${data_dir}/prompt
+task_dir: ${prompt_dir}/task
+
+log_path: ${work_dir}/log
+save_image: False
+
+# task related
+task_name: ["notionovidb"]
+
+# user related
+end_token: ["&&"]
+
+# debug & verbose & log & record
+debug: False
+verbose: True
+record: True
+exp_name: ""
+
+# random seeds
+seed: 0
+
+## core
+# llm
+llm_name: chatgpt_api
+llm_device: "cuda"
+
+# prompt manager
+prompt_manager_name: data_base
+prompt_device: "cuda"
+prompt_top_k: 5
+
+## app
+app_name: base
+
+hydra:
+  run:
+    dir: ${work_dir}

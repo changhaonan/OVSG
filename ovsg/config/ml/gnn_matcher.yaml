@@ -1,0 +1,29 @@
+# @package _global_
+device: cuda
+
+# algorithm choice
+
+# similarity coef
+threshold: 0.5
+
+# txt encoder
+txt_encoder: clip
+
+# model
+padding_size: 10
+max_node_size: 300
+
+# learning
+retrain: False
+num_data: 1000000  # 100000
+lr_rate: 1e-5
+epochs: 100
+batch_size: 32
+save_dir: data/gnn_matcher
+
+# gnn args
+# n_classes: 2
+feat_dim: 10
+dim: 200
+num_layers: 4
+logging: True

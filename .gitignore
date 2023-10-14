@@ -6,7 +6,7 @@
 # data
 log/*
 ovsg/log/*
-*.yaml
+# *.yaml
 *.txt
 *.xml
 test_data/*
