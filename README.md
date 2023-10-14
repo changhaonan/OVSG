@@ -61,12 +61,14 @@ python fire.py --dataset ../../../test_data --stride 1  --detic_exp scannet200-0
 
 ### Running OVSG
 
-Running `OVSG` example without LLM:
+Running `OVSG` example with LLM:
+
+> In the `ovsg/config/api` directory, fill in your OpenAI API key and save the file `openai_demo.yaml` as `openai.yaml` instead and then run:
 ```bash
 python example/exp_ovsg_llm.py
 ```
 
-Running `OVSG` example with LLM:
+Running `OVSG` example without LLM:
 ```bash
 python example/example_ovsg_only.py
 ```
