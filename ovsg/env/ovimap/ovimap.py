@@ -274,7 +274,7 @@ class OVIMap:
                 bbox.color = color
                 center_ball.paint_uniform_color(color)
                 self.external_geometry[f"{instance_id}_bbox"] = bbox
-                self.external_geometry[f"{instance_id}_center"] = center_ballß
+                self.external_geometry[f"{instance_id}_center"] = center_ball
 
         # show external geometries
         external_geometry = kwargs.get("external_geometry", {})

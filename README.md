@@ -6,7 +6,7 @@ To appear at [CoRL'23](https://www.corl2023.org/).
 
 # Intro
 
-We present an Open-Vocabulary 3D Scene Graph (OVSG), a formal framework for grounding a variety of entities, such as object instances, agents, and regions, with free-form text-based queries. Unlike conventional semantic-based object localization approaches, our system facilitates context-aware entity localization, allowing for queries such as ``pick up a cup on a kitchen table" or ``navigate to a sofa on which someone is sitting". In contrast to existing research on 3D scene graphs, OVSG supports free-form text input and open-vocabulary querying. Through a series of comparative experiments using the ScanNet dataset and a self-collected dataset, we demonstrate that our proposed approach significantly surpasses the performance of previous semantic-based localization techniques. Moreover, we highlight the practical application of OVSG in real-world robot navigation and manipulation experiments.  The code and dataset used for evaluation will be made available upon publication.
+We present an Open-Vocabulary 3D Scene Graph (OVSG), a formal framework for grounding a variety of entities, such as object instances, agents, and regions, with free-form text-based queries. Unlike conventional semantic-based object localization approaches, our system facilitates context-aware entity localization, allowing for queries such as "pick up a cup on a kitchen table" or "navigate to a sofa on which someone is sitting". In contrast to existing research on 3D scene graphs, OVSG supports free-form text input and open-vocabulary querying. Through a series of comparative experiments using the ScanNet dataset and a self-collected dataset, we demonstrate that our proposed approach significantly surpasses the performance of previous semantic-based localization techniques. Moreover, we highlight the practical application of OVSG in real-world robot navigation and manipulation experiments.  The code and dataset used for evaluation will be made available upon publication.
 
 # Example
 
@@ -31,16 +31,16 @@ First download the demo data from [Link](https://drive.google.com/file/d/1QZH5Iu
 
 ### Do OVIR-3D Fusion
 
-Run Detic 2D proposal
+Run Detic 2D proposal. For `vocabulary`, we can chooise `lvis`, `ycb_video`, `scannet200`, `imagenet21k`.
 ```
 cd external/OVIR-3D/Detic
-python fire.py --dataset ../../../test_data
+python fire.py --dataset ../../../test_data  --vocabulary scannet200
 ```
 
 Run OVIR-3D fusion
 ```
 cd external/OVIR-3D/src
-python fire.py --dataset ../../../test_data
+python fire.py --dataset ../../../test_data --stride 1  --detic_exp scannet200-0.3
 ```
 
 ### Run OVSG
@@ -62,6 +62,10 @@ Being cleaned. Coming soon.
 ## Trouble Shooting
 
 This repo is being actively maintained, feel free to raise problems in GitHub issues.
+
+# DOVE-G dataset
+
+We also provide a new vision language dataset `DOVE-G`. You can download it from this link: [Link](https://doi.org/10.6084/m9.figshare.24307072.v1).
 
 # Bibtex
 
