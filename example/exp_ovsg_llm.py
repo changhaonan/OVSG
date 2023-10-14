@@ -20,6 +20,10 @@ def app_builder(cfg, **kwargs):
 @hydra.main(config_path="../ovsg/config", config_name="config")
 def launch_ovsg_llm(cfg):
     """Launch chatgpt_m"""
+    # parameters
+    query_method = 'prob'
+    enable_render = True
+
     app = app_builder(cfg)
     task_name_list = cfg.task_name
 
@@ -27,7 +31,7 @@ def launch_ovsg_llm(cfg):
         app.debug()
     else:
         if len(task_name_list) == 1 and task_name_list[0].endswith("hitl"):
-            app.eval(task_name_list[0], hitl=True)
+            app.eval(task_name_list[0], hitl=True, query_method=query_method, enable_render=enable_render)
         else:
             # eval mode
             success_list = []
