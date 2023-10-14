@@ -351,7 +351,6 @@ class NotionOVIDB(NotionDB):
                                         self.notion_graph.link(
                                             notion1=user_notion, relation=rel, notion2=ins_notion
                                         )
-                                        # print("Link", user_notion.name, rel, ins_notion.name)
         # build notion
         self.notion_graph.update()
 
@@ -701,7 +700,7 @@ class NotionOVIDB(NotionDB):
         print(f"Generating match data for {self.scene_map_cfg['scene_name']}...")
         self.build_from_ovi(use_gt_map=False, enable_user=enable_user)
         query_path = os.path.join(self.output_path(), "graph_queries")
-        query_file = os.path.join(query_path, "graph_queries.pkl")
+        query_file = os.path.join(query_path, "graph_queries.pkl") # graph_queries_50.pkl for 50 natural-language queries
         with open(query_file, "rb") as fp:
             data = pickle.load(fp)
         queries = data["queries"]
@@ -726,6 +725,8 @@ class NotionOVIDB(NotionDB):
             results.append(result)
 
         with open(os.path.join(query_path, f"predictions_{method}.pkl"), "wb") as fp:
+            pickle.dump(results, fp)
+        with open(os.path.join(query_path, "predictions_base.pkl"), "wb") as fp:
             pickle.dump(results, fp)
 
     def gen_gnn_data(self, enable_user: bool = False):
@@ -794,23 +795,29 @@ class NotionOVIDB(NotionDB):
             )
             count += 1
 
+    def calc_3d_iou(self, gt_ind: List[int], pred_ind: List[int]):
+        # gt_ind and pred_ind are two lists of indices
+        # Calculate union and intersection and return iou
+        gt_ind = set(gt_ind)
+        pred_ind = set(pred_ind)
+        union = gt_ind.union(pred_ind)
+        intersection = gt_ind.intersection(pred_ind)
+        iou = float(len(intersection)) / float(len(union))
+        return round(iou, 3)
+
     def eval_query(self, use_gt_map: bool = False, use_relation: bool = True, method: str = "prob"):
         """Eval"""
         query_path = os.path.join(self.output_path(), "graph_queries")
         # load the query and parse
-        query_file = os.path.join(query_path, "graph_queries.pkl")
+        query_file = os.path.join(query_path, "graph_queries.pkl") # graph_queries_50.pkl for 50 natural-language queries
         with open(query_file, "rb") as fp:
             data = pickle.load(fp)
         address = data["address"]
-        # statics
+        # statistics
         top_1_iou_avg = 0
         top_3_iou_avg = 0
-        if method == "base":
-            query_file_list = [f for f in os.listdir(query_path) if f.startswith("predictions_")]
-            query_file = os.path.join(query_path, query_file_list[0])
-        else:
-            query_file = os.path.join(query_path, f"predictions_{method}.pkl")
 
+        query_file = os.path.join(query_path, f"predictions_{method}.pkl")
         gt_match_file = os.path.join(os.path.dirname(os.path.dirname(query_path)), "gt_match.pkl")
         with open(gt_match_file, "rb") as fp:
             gt_match = pickle.load(fp)
@@ -818,6 +825,12 @@ class NotionOVIDB(NotionDB):
         with open(query_file, "rb") as fp:
             results = pickle.load(fp)
         num_queries = len(results)
+        IoU_3d_arr = []
+        mIoU_3d = []
+        IoU_15 = 0
+        IoU_25 = 0
+        IoU_50 = 0
+        IoU_75 = 0
         top1_matches = 0
         top3_matches = 0
         left_out_queries = 0
@@ -832,6 +845,13 @@ class NotionOVIDB(NotionDB):
         iclass_wise_top1_misses = dict()
         iclass_wise_top3_misses = dict()
 
+        with open(os.path.join(self.scene_map_cfg["data_path"], self.scene_map_cfg["scene_name"], "detic_output", self.scene_map_cfg["detic_exp"], "predictions", self.scene_map_cfg["annotation_file"]), "rb") as fp:
+            pt_file = pickle.load(fp)
+        ovir = pt_file.nodes(data=True)
+        
+        with open(os.path.join(self.scene_map_cfg["data_path"], self.scene_map_cfg["scene_name"], "detic_output", self.scene_map_cfg["detic_exp"], "predictions", self.scene_map_cfg["annotation_gt_file"]), "rb") as fp:
+            gt_file = pickle.load(fp)
+
         for ind, result in enumerate(results):
             target_address = address[result["target"]["id"]]
             top_1_iou = 0
@@ -841,6 +861,18 @@ class NotionOVIDB(NotionDB):
             else:
                 candidate_pool = result["candidates"]
             if len(candidate_pool) > 2:
+                iou3d = self.calc_3d_iou(gt_file[int(result["target"]["id"])]["pt_indices"], ovir[int(candidate_pool[0]["id"])]["pt_indices"])
+                IoU_3d_arr.append(iou3d)
+                if iou3d > 0.15:
+                    IoU_15 += 1
+                if iou3d > 0.25:
+                    IoU_25 += 1
+                if iou3d > 0.5:
+                    IoU_50 += 1
+                if iou3d > 0.75:
+                    IoU_75 += 1
+                pass    
+                
                 if result["target"]["id"] in gt_match["gt2ovi_map"]:
                     upper_bound += 1
                 found_top3_match = False
@@ -902,7 +934,7 @@ class NotionOVIDB(NotionDB):
                                     iclass_wise_top3_matches[result["target"]["name"]].append(ind)
 
                         top_3_iou = iou_j if top_3_iou < iou_j else top_3_iou
-                # finally, I just compare the result
+                # finally, we just compare the result
                 if not found_top1_match:
                     if result["target"]["name"] not in class_wise_top1_misses:
                         class_wise_top1_misses[result["target"]["name"]] = 1
@@ -930,11 +962,40 @@ class NotionOVIDB(NotionDB):
             # update iou_avg
             top_1_iou_avg += top_1_iou
             top_3_iou_avg += top_3_iou
-        top_1_iou_avg /= num_queries - left_out_queries
-        top_3_iou_avg /= num_queries - left_out_queries
+        # top_1_iou_avg /= num_queries - left_out_queries
+        # top_3_iou_avg /= num_queries - left_out_queries
         print(f"top_1_iou_avg: {top_1_iou_avg}")
         print(f"top_3_iou_avg: {top_3_iou_avg}")
+        mIoU_3d = round( float(sum(IoU_3d_arr))  / len(IoU_3d_arr), 3)
+        print(f"mIoU_3d: {mIoU_3d}")
+        IoU_15_val = IoU_15
+        print(f"IoU_15_val: {IoU_15_val}")
+        IoU_25_val = IoU_25
+        print(f"IoU_25_val: {IoU_25_val}")
+        IoU_50_val = IoU_50
+        print(f"IoU_50_val: {IoU_50_val}")
+        IoU_75_val = IoU_75
+        print(f"IoU_75_val: {IoU_75_val}")
+        IoU_15 = round( (IoU_15*100) / len(IoU_3d_arr), 2)
+        print(f"IoU_15: {IoU_15}%")
+        IoU_25 = round( (IoU_25*100) / len(IoU_3d_arr), 2)
+        print(f"IoU_25: {IoU_25}%")
+        IoU_50 = round( (IoU_50*100) / len(IoU_3d_arr), 2)
+        print(f"IoU_50: {IoU_50}%")
+        IoU_75 = round( (IoU_75*100) / len(IoU_3d_arr), 2)
+        print(f"IoU_75: {IoU_75}%")
+        # print(sorted(IoU_3d_arr, reverse=True))
         res = {
+            "mIoU_3d": mIoU_3d,
+            "IoU_15": IoU_15,
+            "IoU_25": IoU_25,
+            "IoU_50": IoU_50,
+            "IoU_75": IoU_75,
+            "IoU_3d_arr": IoU_3d_arr,
+            "IoU_15_val": IoU_15_val,
+            "IoU_25_val": IoU_25_val,
+            "IoU_50_val": IoU_50_val,
+            "IoU_75_val": IoU_75_val,
             "top_1_iou_avg": top_1_iou_avg,
             "top_3_iou_avg": top_3_iou_avg,
             "top1_matches": top1_matches,
@@ -973,10 +1034,11 @@ class NotionOVIDB(NotionDB):
             self.eval_query()
         elif task_type == "gen_query":
             self.scene_map_cfg["scene_name"] = task_scene
-            # self.eval_enable_user = ~self.eval_enable_user
-            self.gen_gt_match(iou_thresh=self.eval_iou_thresh)
-            self.gen_query_data(use_gt_map=True, enable_user=self.eval_enable_user)
 
+            self.eval_enable_user = True
+            self.gen_gt_match(iou_thresh=self.eval_iou_thresh)
+
+            self.gen_query_data(use_gt_map=True, enable_user=self.eval_enable_user)
             self.gen_match_data(
                 top_k=self.eval_top_k, method="jaccard", enable_user=self.eval_enable_user
             )
@@ -988,7 +1050,26 @@ class NotionOVIDB(NotionDB):
             self.gen_match_data(
                 top_k=self.eval_top_k, method="prob", enable_user=self.eval_enable_user
             )
-            self.gen_gnn_data(enable_user=self.eval_enable_user)
+
+            self.eval_query(method="jaccard")
+            self.eval_query(method="szymkiewicz_simpson")
+            self.eval_query(method="prob")
+            self.eval_query(method="base")
+
+            self.eval_enable_user = False
+            
+            self.gen_query_data(use_gt_map=True, enable_user=self.eval_enable_user)
+            self.gen_match_data(
+                top_k=self.eval_top_k, method="jaccard", enable_user=self.eval_enable_user
+            )
+            self.gen_match_data(
+                top_k=self.eval_top_k,
+                method="szymkiewicz_simpson",
+                enable_user=self.eval_enable_user,
+            )
+            self.gen_match_data(
+                top_k=self.eval_top_k, method="prob", enable_user=self.eval_enable_user
+            )
             self.eval_query(method="jaccard")
             self.eval_query(method="szymkiewicz_simpson")
             self.eval_query(method="prob")
