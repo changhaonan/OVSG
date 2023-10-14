@@ -9,7 +9,7 @@ To appear at [CoRL '23](https://www.corl2023.org/).
 ## Introduction
 Welcome to the official implementation of Open-Vocabulary 3D Scene Graphs (OVSG). 
 
-OVSG is a formal framework designed for grounding various entities, including object instances, agents, and regions, using free-form text-based queries. Unlike traditional semantic-based object localization methods, OVSG enables context-aware entity localization, allowing queries like `"pick up a cup on a kitchen table``` or `"navigate to a sofa on which someone is sitting.``` In contrast to existing 3D scene graph research, OVSG supports open-vocabulary querying and free-form text input. 
+OVSG is a formal framework designed for grounding various entities, including object instances, agents, and regions, using free-form text-based queries. Unlike traditional semantic-based object localization methods, OVSG enables context-aware entity localization, allowing queries like "pick up a cup on a kitchen table" or "navigate to a sofa on which someone is sitting." In contrast to existing 3D scene graph research, OVSG supports open-vocabulary querying and free-form text input. 
 
 We have conducted comparative experiments using the ScanNet dataset and a self-collected dataset [DOVE-G](https://doi.org/10.6084/m9.figshare.24307072.v1), demonstrating that our approach outperforms previous semantic-based localization techniques significantly. Furthermore, we showcase the practical applications of OVSG in real-world robot navigation and manipulation experiments. 
 
@@ -31,6 +31,7 @@ git clone https://github.com/changhaonan/OVSG
 ```bash
 git submodule update --init --recursive
 ```
+
 `OVSG` relies on `OVIR-3D` as its backbone, so before installing `OVSG`, please follow the installation instructions provided in the `OVIR-3D` README.
 
 After installing `OVIR-3D`, you can install `OVSG` by running:
@@ -46,7 +47,7 @@ Start by downloading the demo data from this [link](https://drive.google.com/fil
 
 ### Do OVIR-3D Fusion
 
-Running Detic 2D proposal. For `vocabulary`, we can chooise `lvis`, `ycb_video`, `scannet200`, `imagenet21k`.
+Running Detic 2D proposal. For `vocabulary`, we can choose `lvis`, `ycb_video`, `scannet200`, `imagenet21k`.
 ```bash
 cd external/OVIR-3D/Detic
 python fire.py --dataset ../../../test_data  --vocabulary scannet200

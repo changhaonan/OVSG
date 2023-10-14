@@ -1,0 +1,61 @@
+# @package _global_
+env_name: notionovidb
+
+## notion related
+notion_base: default
+notion_device: "cuda"
+
+# encoder
+notion_txt_encoder: ["st", "clip"]
+notion_usr_encoder: ["st"]
+notion_rel_encoder: ["st"] # "wv"
+notion_img_encoder: ["clip"]
+notion_ins_encoder: ["detic"]
+
+# address
+notion_address: spatial
+
+# gnn
+# gnn_padding: 20
+gnn_padding: 0
+gnn_max_node_size: 300
+
+# params:
+notion_near_thres: 2.0
+notion_overlap_thres: 0.001
+
+# test
+notion_dir: ${data_dir}/notion
+
+# OVIR-3D loading
+is_scannet: True
+ovi_data_path: ${work_dir}/test_data/
+ovi_scene_name: scene0645_00
+ovi_detic_exp: imagenet21k-0.3
+ovi_annotation_file: "proposed_fusion_detic_iou-0.25_recall-0.50_feature-0.75_interval-300.pkl"
+ovi_annotation_gt_file: None
+ovi_dataset: custom_scannet
+ovi_device: cuda
+
+# render related
+render_height: 1000
+render_width: 800
+render_intrinsic: [[1000, 0, 399.5], [0, 1000, 499.5]]
+render_extrinsic: None
+
+# eval
+eval_top_k: 5
+eval_iou_thresh: 0.5
+eval_enable_user: True
+
+# user settings
+user_default_photo: ${notion_dir}/user.jpeg
+
+# region relation
+rebuild_region: False
+region_resolution: 0.1
+
+# execute option
+execute_options:
+  query_method: prob
+  enable_render: False

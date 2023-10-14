@@ -1,0 +1,20 @@
+# @package _global_
+device: cuda
+
+# txt encoder
+txt_encoder: clip
+
+# model
+spatial_input_size: 18
+txt_input_size: 512
+hidden_size: 1024
+embedding_size: 512
+
+# learning
+retrain: False
+# num_data: 1000000  # 100000
+num_data: 100000  # 100000
+lr_rate: 1e-5
+epochs: 100
+batch_size: 256
+save_dir: data/spatial_encoder
