@@ -529,8 +529,10 @@ class NotionOVIDB(NotionDB):
             else:
                 notions_matched.remove(target)
                 notions_matched = [target] + notions_matched
+            # reverse the order
+            notions_matched = notions_matched[::-1]  # put the target last in case of occlusion
             self.render(notions=notions_matched, title=f"top_{i}")
-        self.scene_map.visualize_3d(show_origin=True)
+        self.scene_map.visualize_3d(show_origin=True, show_bbox=True)
         return result
 
     # main interface
@@ -700,7 +702,7 @@ class NotionOVIDB(NotionDB):
         print(f"Generating match data for {self.scene_map_cfg['scene_name']}...")
         self.build_from_ovi(use_gt_map=False, enable_user=enable_user)
         query_path = os.path.join(self.output_path(), "graph_queries")
-        query_file = os.path.join(query_path, "graph_queries.pkl") # graph_queries_50.pkl for 50 natural-language queries
+        query_file = os.path.join(query_path, "graph_queries.pkl")  # graph_queries_50.pkl for 50 natural-language queries
         with open(query_file, "rb") as fp:
             data = pickle.load(fp)
         queries = data["queries"]
@@ -809,7 +811,7 @@ class NotionOVIDB(NotionDB):
         """Eval"""
         query_path = os.path.join(self.output_path(), "graph_queries")
         # load the query and parse
-        query_file = os.path.join(query_path, "graph_queries.pkl") # graph_queries_50.pkl for 50 natural-language queries
+        query_file = os.path.join(query_path, "graph_queries.pkl")  # graph_queries_50.pkl for 50 natural-language queries
         with open(query_file, "rb") as fp:
             data = pickle.load(fp)
         address = data["address"]
@@ -848,7 +850,7 @@ class NotionOVIDB(NotionDB):
         with open(os.path.join(self.scene_map_cfg["data_path"], self.scene_map_cfg["scene_name"], "detic_output", self.scene_map_cfg["detic_exp"], "predictions", self.scene_map_cfg["annotation_file"]), "rb") as fp:
             pt_file = pickle.load(fp)
         ovir = pt_file.nodes(data=True)
-        
+
         with open(os.path.join(self.scene_map_cfg["data_path"], self.scene_map_cfg["scene_name"], "detic_output", self.scene_map_cfg["detic_exp"], "predictions", self.scene_map_cfg["annotation_gt_file"]), "rb") as fp:
             gt_file = pickle.load(fp)
 
@@ -871,8 +873,8 @@ class NotionOVIDB(NotionDB):
                     IoU_50 += 1
                 if iou3d > 0.75:
                     IoU_75 += 1
-                pass    
-                
+                pass
+
                 if result["target"]["id"] in gt_match["gt2ovi_map"]:
                     upper_bound += 1
                 found_top3_match = False
@@ -966,7 +968,7 @@ class NotionOVIDB(NotionDB):
         # top_3_iou_avg /= num_queries - left_out_queries
         print(f"top_1_iou_avg: {top_1_iou_avg}")
         print(f"top_3_iou_avg: {top_3_iou_avg}")
-        mIoU_3d = round( float(sum(IoU_3d_arr))  / len(IoU_3d_arr), 3)
+        mIoU_3d = round(float(sum(IoU_3d_arr)) / len(IoU_3d_arr), 3)
         print(f"mIoU_3d: {mIoU_3d}")
         IoU_15_val = IoU_15
         print(f"IoU_15_val: {IoU_15_val}")
@@ -976,13 +978,13 @@ class NotionOVIDB(NotionDB):
         print(f"IoU_50_val: {IoU_50_val}")
         IoU_75_val = IoU_75
         print(f"IoU_75_val: {IoU_75_val}")
-        IoU_15 = round( (IoU_15*100) / len(IoU_3d_arr), 2)
+        IoU_15 = round((IoU_15*100) / len(IoU_3d_arr), 2)
         print(f"IoU_15: {IoU_15}%")
-        IoU_25 = round( (IoU_25*100) / len(IoU_3d_arr), 2)
+        IoU_25 = round((IoU_25*100) / len(IoU_3d_arr), 2)
         print(f"IoU_25: {IoU_25}%")
-        IoU_50 = round( (IoU_50*100) / len(IoU_3d_arr), 2)
+        IoU_50 = round((IoU_50*100) / len(IoU_3d_arr), 2)
         print(f"IoU_50: {IoU_50}%")
-        IoU_75 = round( (IoU_75*100) / len(IoU_3d_arr), 2)
+        IoU_75 = round((IoU_75*100) / len(IoU_3d_arr), 2)
         print(f"IoU_75: {IoU_75}%")
         # print(sorted(IoU_3d_arr, reverse=True))
         res = {
@@ -1057,7 +1059,7 @@ class NotionOVIDB(NotionDB):
             self.eval_query(method="base")
 
             self.eval_enable_user = False
-            
+
             self.gen_query_data(use_gt_map=True, enable_user=self.eval_enable_user)
             self.gen_match_data(
                 top_k=self.eval_top_k, method="jaccard", enable_user=self.eval_enable_user

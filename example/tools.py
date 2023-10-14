@@ -67,15 +67,8 @@ def convert_ply2pcd(ply_path, pcd_path):
     return pcd
 
 
-if __name__ == "__main__":
-    root_dir = os.path.join(os.path.dirname(__file__), "..")
-    scene_name = "scene0645_00"  # "scene0645_00", "cus_scene0001_00"
-    demo_ply_file = os.path.join(root_dir, "test_data", scene_name, f"{scene_name}_vh_clean_2.ply")
-    demo_pcd_file = os.path.join(root_dir, "test_data", scene_name, "scan-00.pcd")  # fit with OVIR-3D format
-    # convert_ply2pcd(demo_ply_file, demo_pcd_file)
-
-    # load pcd
-    pcd = o3d.io.read_point_cloud(demo_ply_file)
+def compute_aligned_T(pcd):
+    """Compute the aligned transform, which is center at scene, with z-axis pointing up."""
 
     obb = pcd.get_minimal_oriented_bounding_box()
     obb.color = (1, 0, 0)
@@ -86,18 +79,66 @@ if __name__ == "__main__":
     aligned_T = np.eye(4, dtype=np.float32)
     aligned_T[:3, :3] = obb.R
     aligned_T[:3, 3] = obb.center
-    
-    # 
 
-    vis_list = [pcd, obb]
-    aligned_origin = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1.0)
-    aligned_origin.transform(aligned_T)
-    vis_list.append(aligned_origin)
+    # select the new-z-axis, which is closest to floor z-axis
+    axis_dist = np.inf
+    for axis in [aligned_T[:3, 0], aligned_T[:3, 1], aligned_T[:3, 2]]:
+        dist = np.linalg.norm(np.cross(axis, floor_T[:3, 2]))
+        if dist < axis_dist:
+            axis_dist = dist
+            new_z_axis = axis
+    # flip the new-z-axis if it is not pointing downwards
+    if new_z_axis.dot(floor_T[:3, 2]) > 0:
+        new_z_axis = -new_z_axis
+    # select the new-x-axis, which is closest to floor x-axis
+    axis_dist = np.inf
+    for axis in [aligned_T[:3, 0], aligned_T[:3, 1], aligned_T[:3, 2]]:
+        dist = np.linalg.norm(np.cross(axis, floor_T[:3, 0]))
+        if dist < axis_dist:
+            axis_dist = dist
+            new_x_axis = axis
+    # compute the new-y-axis
+    new_y_axis = np.cross(new_z_axis, new_x_axis)
+    new_y_axis = new_y_axis / np.linalg.norm(new_y_axis)
+    # compute the new transform
+    new_aligned_T = np.eye(4, dtype=np.float32)
+    new_aligned_T[:3, 0] = new_x_axis
+    new_aligned_T[:3, 1] = new_y_axis
+    new_aligned_T[:3, 2] = new_z_axis
 
-    floor_origin = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1.0)
-    floor_origin.transform(floor_T)
-    vis_list.append(floor_origin)
+    floor_offset = (floor_T[:3, 3] - obb.center).dot(new_z_axis)
+    new_aligned_T[:3, 3] = obb.center + floor_offset * new_z_axis
 
-    origin = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1.0)
-    vis_list.append(origin)
-    o3d.visualization.draw_geometries(vis_list)
+    return new_aligned_T, floor_T, obb
+
+
+if __name__ == "__main__":
+    root_dir = os.path.join(os.path.dirname(__file__), "..")
+    scene_name = "scene0645_00"  # "scene0645_00", "cus_scene0001_00"
+    demo_ply_file = os.path.join(root_dir, "test_data", scene_name, f"{scene_name}_vh_clean_2.ply")
+    demo_pcd_file = os.path.join(root_dir, "test_data", scene_name, "scan-00.pcd")  # fit with OVIR-3D format
+
+    # # load pcd
+    # pcd = o3d.io.read_point_cloud(demo_ply_file)
+
+    # new_aligned_T, floor_T, obb = compute_aligned_T(pcd)
+
+    # vis_list = [pcd, obb]
+    # aligned_origin = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1.0)
+    # aligned_origin.transform(new_aligned_T)
+    # vis_list.append(aligned_origin)
+
+    # floor_origin = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1.0)
+    # floor_origin.transform(floor_T)
+    # vis_list.append(floor_origin)
+
+    # origin = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1.0)
+    # vis_list.append(origin)
+    # o3d.visualization.draw_geometries(vis_list)
+
+    # # save axis_alignment.txt
+    # np.savetxt(os.path.join(root_dir, "test_data", scene_name, "axis_alignment.txt"), np.linalg.inv(new_aligned_T))
+
+    # read ply & render
+    pcd = o3d.io.read_triangle_mesh(demo_ply_file)
+    o3d.visualization.draw_geometries([pcd])

@@ -6,6 +6,9 @@
 # data
 log/*
 ovsg/log/*
+*.json
+*.png
+
 # *.yaml
 *.txt
 # *.xml

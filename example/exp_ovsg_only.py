@@ -16,8 +16,8 @@ def launch_ovsg_only(cfg):
     env = env_builder(cfg)
     env.reset()
     # if not using llm, ovsg consume structured language input
-    query = ("target @ book {object}\n" +  # target
-             "book {object} -- on [spatial] -- bed {object}")  # specification
+    query = ("target @ pillow {object}\n" +  # target
+             "pillow {object} -- on [spatial] -- chair {object}")  # specification
     env.chat(query, query_method=query_method, enable_render=enable_render, verbose=verbose)
 
 

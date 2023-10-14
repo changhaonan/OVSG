@@ -1,5 +1,6 @@
 """Example on directly using Open-Vocabulary Instance Map (ovimap)"""
 import os
+import cv2
 import numpy as np
 from ovsg.env.ovimap.ovimap import OVIMapDetic
 
@@ -32,9 +33,12 @@ if __name__ == "__main__":
     queries = ["book", "bed", "sofa", "chair", "towel"]
 
     for query in queries:
-        queried_instance = ovimap.query(query, top_k=10)
+        queried_instance = ovimap.query(query, top_k=3)
         for i, inst in enumerate(queried_instance):
             ovimap.mark(inst)
-        # img = ovimap.render(show_inst_img=True)
-        ovimap.visualize_3d(show_bbox=False)
+        img = ovimap.render(show_inst_img=True)
+        cv2.imshow(f"query-{query}", img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        ovimap.visualize_3d(show_bbox=True, show_origin=True)
         ovimap.clear_mark()
