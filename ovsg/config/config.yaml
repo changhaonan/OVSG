@@ -12,7 +12,7 @@ defaults:
 work_dir: ${hydra:runtime.cwd}
 
 # path to folder with data
-data_dir: ${work_dir}/data
+data_dir: ${work_dir}/ovsg/data
 prompt_dir: ${data_dir}/prompt
 knowledge_dir: ${data_dir}/prompt
 task_dir: ${prompt_dir}/task
@@ -21,7 +21,7 @@ log_path: ${work_dir}/log
 save_image: False
 
 # task related
-task_name: ["notionovidb"]
+task_name: ["notiondb_hitl"]
 
 # user related
 end_token: ["&&"]

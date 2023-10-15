@@ -39,11 +39,12 @@ class OVIMap:
         self.load_geometry(geometry_file, info_file)
         # data structure
         self.instances = []
+        self.marked_instances = []
         # camera params
         self.img_height = img_height
         self.img_width = img_width
         if extrinsic is None:
-            center = np.asarray(self.vis_pcd.get_center())
+            center = np.asarray(self.vis_ply.get_center())
             camera_pose = np.eye(4)
             camera_pose[:3, 3] = center + np.array([0, 0, self.scene_scale]) * 1.5
             # rotate along x-axis
@@ -100,20 +101,17 @@ class OVIMap:
                 warnings.warn("Cannot load transformation.")
             self.scene_pcd = o3d.io.read_point_cloud(geometry_file)
             self.scene_pcd.transform(transformation)
-            # update scene scale
-            self.scene_scale = np.linalg.norm(
-                np.asarray(self.scene_pcd.get_max_bound())
-                - np.asarray(self.scene_pcd.get_min_bound())
-            )
-            self.vis_pcd = copy.deepcopy(self.scene_pcd)
+            self.scene_ply = o3d.io.read_triangle_mesh(geometry_file)
+            self.scene_ply.transform(transformation)
         else:
             self.scene_pcd = o3d.io.read_point_cloud(geometry_file)
-            # update scene scale
-            self.scene_scale = np.linalg.norm(
-                np.asarray(self.scene_pcd.get_max_bound())
-                - np.asarray(self.scene_pcd.get_min_bound())
-            )
-            self.vis_pcd = copy.deepcopy(self.scene_pcd)
+            self.scene_ply = o3d.io.read_triangle_mesh(geometry_file)
+        # update scene scale
+        self.scene_scale = np.linalg.norm(
+            np.asarray(self.scene_pcd.get_max_bound())
+            - np.asarray(self.scene_pcd.get_min_bound())
+        )
+        self.vis_ply = copy.deepcopy(self.scene_ply)
 
     def query(self, query, top_k=1):
         """Query the map with a query string."""
@@ -178,7 +176,7 @@ class OVIMap:
         for id in instance_id:
             self.external_image.append(self.get_img(id).astype(np.uint8))
             indices_3d = self.instances[id]["pt_indices"]
-            pcd_colors = np.asarray(self.vis_pcd.colors)
+            pcd_colors = np.asarray(self.vis_ply.vertex_colors)
             if color is None:
                 # random color
                 pcd_color = np.random.rand(3)
@@ -188,12 +186,15 @@ class OVIMap:
                 pcd_color = np.array(color)
                 pcd_colors[indices_3d] = pcd_color
             self.external_color.append(pcd_color)
+            self.marked_instances.append(id)
 
     def clear_mark(self):
         """Clear all marked instances."""
         self.external_image = []
         self.external_color = []
-        self.vis_pcd.colors = copy.deepcopy(self.scene_pcd.colors)
+        self.external_geometry = {}
+        self.vis_ply.vertex_colors = copy.deepcopy(self.scene_ply.vertex_colors)
+        self.marked_instances = []
 
     def draw_path(self, vis_image, path, color=None):
         """Draw a path on an image."""
@@ -216,7 +217,7 @@ class OVIMap:
         self.external_image = []
         self.external_color = []
         self.external_geometry = {}
-        self.vis_pcd = copy.deepcopy(self.scene_pcd)
+        self.vis_ply = copy.deepcopy(self.scene_ply)
 
     def get_clip_feature(self, _input: Union[str, List[str], np.ndarray], normalize=True):
         """Get the clip feature of a text label."""
@@ -240,7 +241,7 @@ class OVIMap:
     def visualize_3d(self, **kwargs):
         """Show the scene with marked instances in 3d."""
         show_origin = kwargs.get("show_origin", False)
-        vis_list = [self.vis_pcd]
+        vis_list = [self.vis_ply]
         if show_origin:
             origin = o3d.geometry.TriangleMesh.create_coordinate_frame(
                 size=0.1 * self.scene_scale, origin=[0, 0, 0]
@@ -258,7 +259,7 @@ class OVIMap:
         show_bbox = kwargs.get("show_bbox", False)
         if show_bbox:
             # nodes
-            for instance_id in range(len(self.instances)):
+            for instance_id in self.marked_instances:
                 instance_pcd = self.get_pcd(instance_id)
                 bbox = instance_pcd.get_axis_aligned_bounding_box()
                 # create a ball for center
@@ -278,9 +279,20 @@ class OVIMap:
 
         # show external geometries
         external_geometry = kwargs.get("external_geometry", {})
+        #
         o3d.visualization.draw_geometries(
             [*vis_list, *self.external_geometry.values(), *external_geometry.values()]
         )
+        # set visualization
+        # vis = o3d.visualization.Visualizer()
+        # vis.create_window(width=self.img_width, height=self.img_height, visible=False)
+        # vis.get_render_option().point_size = 2.0  # Set the desired point size here
+        # vis_list = [*vis_list, *self.external_geometry.values(), *external_geometry.values()]
+        # for geometry in vis_list:
+        #     vis.add_geometry(geometry)
+        # vis.create_window()
+        # vis.run()
+        # vis.destroy_window()
 
     def get_camera_image_top(self, **kwargs):
         """Get the top view of the scene."""
@@ -289,7 +301,7 @@ class OVIMap:
         vis = o3d.visualization.VisualizerWithKeyCallback()
         vis.create_window(width=self.img_width, height=self.img_height, visible=False)
         vis.get_render_option().point_size = 2
-        vis.add_geometry(self.vis_pcd)
+        vis.add_geometry(self.vis_ply)
         for geometry in self.external_geometry.values():
             vis.add_geometry(geometry)
         # add the origin

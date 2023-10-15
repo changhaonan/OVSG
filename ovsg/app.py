@@ -126,7 +126,7 @@ class AppSeq(Chatter):
         return reply, action_executed
 
     # eval method
-    def eval(self, task_name, hitl=False):
+    def eval(self, task_name, hitl=False, **kwargs):
         """Human in the loop"""
         task = self.task_builder(task_name)
         # init
@@ -149,7 +149,7 @@ class AppSeq(Chatter):
                         action_executed = False
                         round = 0
                         continue
-                    elif current_content.upper() in ["STOP", "QUIT", "EXIT", "Q"]:
+                    elif current_content.upper() in ["STOP", "QUIT", "EXIT", "Q", "END"]:
                         break
                 else:
                     if round < len(task):
@@ -159,7 +159,7 @@ class AppSeq(Chatter):
                         break
 
             # chat
-            reply, action_executed = self.chat(current_content, verbose=self.verbose, label=current_label)
+            reply, action_executed = self.chat(current_content, verbose=self.verbose, label=current_label, **kwargs)
             # update round
             round = round + 1
         # log

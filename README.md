@@ -43,7 +43,7 @@ pip install -e .
 
 ## Running Instructions
 
-Start by downloading the demo data from this [link](https://drive.google.com/file/d/1QZH5IuKMuxcTAf4NMJQKzWCr-M26xLer/view?usp=sharing). Place the data into the `test_data` folder and extract it there. Then, run `OVIR-3D` to perform the fusion:
+Start by downloading the demo data from this [link](https://drive.google.com/file/d/1Gvo-6Lfk93i3NrZ2BahIrUs_BZzIRZyg/view?usp=drive_link). Place the data into the `test_data` folder and extract it there. Then, run `OVIR-3D` to perform the fusion:
 
 ### Do OVIR-3D Fusion
 
