@@ -2,6 +2,7 @@
 .hydra
 *.pyc
 *.log
+.DS_Store
 
 # data
 log/*

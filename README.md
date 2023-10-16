@@ -13,6 +13,15 @@ OVSG is a formal framework designed for grounding various entities, including ob
 
 We have conducted comparative experiments using the ScanNet dataset and a self-collected dataset [DOVE-G](https://doi.org/10.6084/m9.figshare.24307072.v1), demonstrating that our approach outperforms previous semantic-based localization techniques significantly. Furthermore, we showcase the practical applications of OVSG in real-world robot navigation and manipulation experiments. 
 
+## Illustration of Context-aware grounding
+
+<p float="left">
+  <img src="./media/grounding.png" width="45%" />
+  <img src="./media/context_aware_grounding.png" width="45%" /> 
+</p>
+
+This is an illustration of the context-aware grounding. Context-aware grounding implies the system should not only consider the object category but also its related entities inside the context. This comparison shows that context-aware grounding can provides a more accurate localization.
+
 ## Example
 
 ![OVSG Example](./media/OVSG-L.drawio.png)
