@@ -13,7 +13,7 @@ OVSG is a formal framework designed for grounding various entities, including ob
 
 We have conducted comparative experiments using the ScanNet dataset and a self-collected dataset [DOVE-G](https://doi.org/10.6084/m9.figshare.24307072.v1), demonstrating that our approach outperforms previous semantic-based localization techniques significantly. Furthermore, we showcase the practical applications of OVSG in real-world robot navigation and manipulation experiments. 
 
-## Illustration of Context-aware grounding
+## Illustration of Context-aware Grounding
 
 <p float="left">
   <img src="./media/grounding.png" width="45%" />
